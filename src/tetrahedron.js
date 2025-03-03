@@ -72,9 +72,10 @@ rotations.push(
 let currentRotation = 0;
 let targetQuaternion = new THREE.Quaternion();
 let rotationCount = 0;
+let isRotating = false;
 
 const counterDisplay = document.createElement("div");
-counterDisplay.innerText = 'Rotations: ${rotationCount}';
+counterDisplay.innerText = `Rotations: ${rotationCount}`;
 counterDisplay.style.position = "absolute";
 counterDisplay.style.top = "50px";
 counterDisplay.style.left = "10px";
@@ -82,20 +83,28 @@ counterDisplay.style.padding = "10px";
 counterDisplay.style.background = "white";
 document.body.appendChild(counterDisplay);
 
+function highlightCurrentAxis() {
+    axisLines.forEach(line => line.material.color.set(0xff0000));
+    const axisIndex = Math.floor(currentRotation / 2);
+    axisLines[axisIndex].material.color.set(0x00ff00);
+}
+
+highlightCurrentAxis();
+
 function animate() {
     requestAnimationFrame(animate);
-    tetrahedron.quaternion.slerp(targetQuaternion, 0.1);
+    if (isRotating) {
+        tetrahedron.quaternion.slerp(targetQuaternion, 0.1);
+        if (tetrahedron.quaternion.angleTo(targetQuaternion) < 0.01) {
+            tetrahedron.quaternion.copy(targetQuaternion);
+            isRotating = false;
+            rotationCount++;
+            counterDisplay.innerText = `Rotations: ${rotationCount}`;
+        }
+    }
     renderer.render(scene, camera);
 }
 animate();
-
-function highlightNextAxis() {
-    axisLines.forEach(line => line.material.color.set(0xff0000));
-    const nextRotationIndex = (currentRotation) % rotations.length;
-    const axisIndex = Math.floor(nextRotationIndex / 2);
-    axisLines[axisIndex].material.color.set(0x00ff00);
-}
-highlightNextAxis();
 
 targetQuaternion.copy(rotations[currentRotation]);
 const button = document.createElement("button");
@@ -107,9 +116,10 @@ button.style.padding = "10px";
 document.body.appendChild(button);
 
 button.addEventListener("click", () => {
-    targetQuaternion.copy(rotations[currentRotation]);
-    currentRotation = (currentRotation + 1) % rotations.length;
-    rotationCount++;
-    counterDisplay.innerText = `Rotations: ${rotationCount}`;
-    highLightNextAxis();
+    if (!isRotating) {
+        isRotating = true;
+        targetQuaternion.copy(rotations[currentRotation]);
+        highlightCurrentAxis();
+        currentRotation = (currentRotation + 1) % rotations.length;
+    }
 });
