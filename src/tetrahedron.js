@@ -48,7 +48,7 @@ const rotationAxes = [
     new THREE.Vector3(0, 0, 1)
 ];
 
-rotationAxes.forEach(axis => {
+const axisLines = rotationAxes.map(axis => {
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3().copy(axis).multiplyScalar(-2),
@@ -56,6 +56,7 @@ rotationAxes.forEach(axis => {
     ]);
     const line = new THREE.Line(lineGeometry, lineMaterial);
     scene.add(line);
+    return line;
 });
 
 const rotations = rotationAxes.flatMap(axis => [
@@ -88,6 +89,14 @@ function animate() {
 }
 animate();
 
+function highlightNextAxis() {
+    axisLines.forEach(line => line.material.color.set(0xff0000));
+    const nextRotationIndex = (currentRotation) % rotations.length;
+    const axisIndex = Math.floor(nextRotationIndex / 2);
+    axisLines[axisIndex].material.color.set(0x00ff00);
+}
+highlightNextAxis();
+
 targetQuaternion.copy(rotations[currentRotation]);
 const button = document.createElement("button");
 button.innerText = "Rotate";
@@ -100,4 +109,7 @@ document.body.appendChild(button);
 button.addEventListener("click", () => {
     targetQuaternion.copy(rotations[currentRotation]);
     currentRotation = (currentRotation + 1) % rotations.length;
+    rotationCount++;
+    counterDisplay.innerText = `Rotations: ${rotationCount}`;
+    highLightNextAxis();
 });
