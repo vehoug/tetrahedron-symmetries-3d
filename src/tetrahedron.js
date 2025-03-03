@@ -51,15 +51,19 @@ const rotationAxes = [
     new THREE.Vector3(0, 0, 1)
 ];
 
-const rotations = rotationAxes.flatMap(axis => [
-    new THREE.Quaternion().setFromAxisAngle(axis, 2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(axis, -2 * Math.PI / 3)
-]);
-rotations.push(
+const rotations = [
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, 1).normalize(), 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(-1, 1, 1).normalize(), 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, -1, 1).normalize(), 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, -1).normalize(), 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, 1).normalize(), -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(-1, 1, 1).normalize(), -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, -1, 1).normalize(), -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, -1).normalize(), -2 * Math.PI / 3),
     new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI),
     new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI),
     new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI)
-);
+];
 
 let currentRotation = 0;
 let targetQuaternion = new THREE.Quaternion();
