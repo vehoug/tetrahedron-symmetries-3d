@@ -48,6 +48,16 @@ const rotationAxes = [
     new THREE.Vector3(0, 0, 1)
 ];
 
+rotationAxes.forEach(axis => {
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3().copy(axis).multiplyScalar(-2),
+        new THREE.Vector3().copy(axis).multiplyScalar(2)
+    ]);
+    const line = new THREE.Line(lineGeometry, lineMaterial);
+    scene.add(line);
+});
+
 const rotations = rotationAxes.flatMap(axis => [
     new THREE.Quaternion().setFromAxisAngle(axis, 2 * Math.PI / 3),
     new THREE.Quaternion().setFromAxisAngle(axis, -2 * Math.PI / 3)
