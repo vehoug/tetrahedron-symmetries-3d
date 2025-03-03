@@ -48,17 +48,6 @@ const rotationAxes = [
     new THREE.Vector3(0, 0, 1)
 ];
 
-const axisLines = rotationAxes.map(axis => {
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3().copy(axis).multiplyScalar(-2),
-        new THREE.Vector3().copy(axis).multiplyScalar(2)
-    ]);
-    const line = new THREE.Line(lineGeometry, lineMaterial);
-    scene.add(line);
-    return line;
-});
-
 const rotations = rotationAxes.flatMap(axis => [
     new THREE.Quaternion().setFromAxisAngle(axis, 2 * Math.PI / 3),
     new THREE.Quaternion().setFromAxisAngle(axis, -2 * Math.PI / 3)
@@ -73,6 +62,7 @@ let currentRotation = 0;
 let targetQuaternion = new THREE.Quaternion();
 let rotationCount = 0;
 let isRotating = false;
+let axisLine = null;
 
 const counterDisplay = document.createElement("div");
 counterDisplay.innerText = `Rotations: ${rotationCount}`;
@@ -83,13 +73,17 @@ counterDisplay.style.padding = "10px";
 counterDisplay.style.background = "white";
 document.body.appendChild(counterDisplay);
 
-function highlightCurrentAxis() {
-    axisLines.forEach(line => line.material.color.set(0xff0000));
-    const axisIndex = Math.floor(currentRotation / 2);
-    axisLines[axisIndex].material.color.set(0x00ff00);
+function showRotationAxis(axis) {
+    if (axisLine) scene.remove(axisLine);
+    
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3().copy(axis).multiplyScalar(-2),
+        new THREE.Vector3().copy(axis).multiplyScalar(2)
+    ]);
+    axisLine = new THREE.Line(lineGeometry, lineMaterial);
+    scene.add(axisLine);
 }
-
-highlightCurrentAxis();
 
 function animate() {
     requestAnimationFrame(animate);
@@ -100,6 +94,8 @@ function animate() {
             isRotating = false;
             rotationCount++;
             counterDisplay.innerText = `Rotations: ${rotationCount}`;
+            
+            if (axisLine) scene.remove(axisLine);
         }
     }
     renderer.render(scene, camera);
@@ -119,7 +115,7 @@ button.addEventListener("click", () => {
     if (!isRotating) {
         isRotating = true;
         targetQuaternion.copy(rotations[currentRotation]);
-        highlightCurrentAxis();
+        showRotationAxis(rotationAxes[Math.floor(currentRotation / 2)]);
         currentRotation = (currentRotation + 1) % rotations.length;
     }
 });
