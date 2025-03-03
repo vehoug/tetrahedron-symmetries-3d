@@ -70,6 +70,16 @@ rotations.push(
 
 let currentRotation = 0;
 let targetQuaternion = new THREE.Quaternion();
+let rotationCount = 0;
+
+const counterDisplay = document.createElement("div");
+counterDisplay.innerText = 'Rotations: ${rotationCount}';
+counterDisplay.style.position = "absolute";
+counterDisplay.style.top = "50px";
+counterDisplay.style.left = "10px";
+counterDisplay.style.padding = "10px";
+counterDisplay.style.background = "white";
+document.body.appendChild(counterDisplay);
 
 function animate() {
     requestAnimationFrame(animate);
