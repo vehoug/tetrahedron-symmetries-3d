@@ -41,28 +41,44 @@ const controls = new OrbitControls(camera, renderer.domElement);
 const axesHelper = new THREE.AxesHelper(3);
 scene.add(axesHelper);
 
+const axisGeometry = new THREE.BufferGeometry();
+const axisMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+const axisLine = new THREE.Line(axisGeometry, axisMaterial);
+axisLine.visible = false;
+scene.add(axisLine);
+
 const rotationAxes = [
+    // For the 120° rotations (2*PI/3)
     new THREE.Vector3(1, 1, 1).normalize(),
     new THREE.Vector3(-1, 1, 1).normalize(),
     new THREE.Vector3(1, -1, 1).normalize(),
     new THREE.Vector3(1, 1, -1).normalize(),
+    // For the -120° rotations (-2*PI/3)
+    new THREE.Vector3(1, 1, 1).normalize(),
+    new THREE.Vector3(-1, 1, 1).normalize(), 
+    new THREE.Vector3(1, -1, 1).normalize(),
+    new THREE.Vector3(1, 1, -1).normalize(),
+    // For the 180° rotations (PI)
     new THREE.Vector3(0, 1, 0),
     new THREE.Vector3(1, 0, 0),
     new THREE.Vector3(0, 0, 1)
 ];
 
 const rotations = [
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, 1).normalize(), 2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(-1, 1, 1).normalize(), 2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, -1, 1).normalize(), 2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, -1).normalize(), 2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, 1).normalize(), -2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(-1, 1, 1).normalize(), -2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, -1, 1).normalize(), -2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 1, -1).normalize(), -2 * Math.PI / 3),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI),
-    new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI)
+    // 120° rotations (2*PI/3)
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[0], 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[1], 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[2], 2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[3], 2 * Math.PI / 3),
+    // -120° rotations (-2*PI/3)
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[4], -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[5], -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[6], -2 * Math.PI / 3),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[7], -2 * Math.PI / 3),
+    // 180° rotations (PI)
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[8], Math.PI),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[9], Math.PI),
+    new THREE.Quaternion().setFromAxisAngle(rotationAxes[10], Math.PI)
 ];
 
 let currentRotation = 0;
@@ -79,24 +95,50 @@ counterDisplay.style.padding = "10px";
 counterDisplay.style.background = "white";
 document.body.appendChild(counterDisplay);
 
+function updateAxisLine(axisIndex) {
+    if (axisIndex >= 0 && axisIndex < rotationAxes.length) {
+        const axis = rotationAxes[axisIndex];
+        
+        const lineLength = 5;
+        const startPoint = axis.clone().multiplyScalar(-lineLength);
+        const endPoint = axis.clone().multiplyScalar(lineLength);
+        
+        const points = [startPoint, endPoint];
+        axisGeometry.setFromPoints(points);
+        
+        axisGeometry.attributes.position.needsUpdate = true;
+    }
+}
+
+function getAxisIndexForRotation(rotationIndex) {
+    return rotationIndex;
+}
+
+updateAxisLine(getAxisIndexForRotation(currentRotation));
+axisLine.visible = true;
+
 function animate() {
     requestAnimationFrame(animate);
     if (isRotating) {
         tetrahedron.quaternion.slerp(targetQuaternion, 0.1);
+        
         if (tetrahedron.quaternion.angleTo(targetQuaternion) < 0.01) {
             tetrahedron.quaternion.copy(targetQuaternion);
             isRotating = false;
             rotationCount++;
             counterDisplay.innerText = `Rotations: ${rotationCount}`;
             
+            tetrahedron.quaternion.identity();
+            
             if (rotationCount >= 12) {
-                tetrahedron.quaternion.identity();
                 rotationCount = 0;
                 currentRotation = 0;
                 counterDisplay.innerText = `Rotations: ${rotationCount}`;
             } else {
                 currentRotation = (currentRotation + 1) % rotations.length;
             }
+            
+            updateAxisLine(getAxisIndexForRotation(currentRotation));
         }
     }
     renderer.render(scene, camera);
