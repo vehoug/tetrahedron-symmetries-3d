@@ -30,9 +30,45 @@ faces.forEach(f => {
 });
 geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-const material = new THREE.MeshBasicMaterial({ color: 0x0077ff, wireframe: true });
+const vertexColors = [
+    new THREE.Color(0x00ffff),
+    new THREE.Color(0xff00ff),
+    new THREE.Color(0xffff00),
+    new THREE.Color(0x00ff00) 
+];
+
+const colors = [];
+faces.forEach(f => {
+    colors.push(...vertexColors[f[0]].toArray());
+    colors.push(...vertexColors[f[1]].toArray());
+    colors.push(...vertexColors[f[2]].toArray());
+});
+
+geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+const material = new THREE.MeshBasicMaterial({ 
+    vertexColors: true,
+    wireframe: false, 
+    transparent: true,
+    opacity: 0.3,
+    side: THREE.DoubleSide
+});
+
+// Add wireframe overlay with glowing effect
+const wireframeMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.3
+});
+
 const tetrahedron = new THREE.Mesh(geometry, material);
+const wireframeTetrahedron = new THREE.Mesh(geometry.clone(), wireframeMaterial);
+tetrahedron.add(wireframeTetrahedron);
 scene.add(tetrahedron);
+
+// Set dark background
+scene.background = new THREE.Color(0x121212);
 
 camera.position.z = 4;
 
@@ -46,6 +82,13 @@ const axisMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
 const axisLine = new THREE.Line(axisGeometry, axisMaterial);
 axisLine.visible = false;
 scene.add(axisLine);
+
+// Enhance axis line visibility with glowing effect
+axisMaterial.color.set(0xff3355);
+
+// Add ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
 
 const rotationAxes = [
     // For the 120° rotations (2*PI/3)
