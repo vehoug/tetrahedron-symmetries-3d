@@ -54,7 +54,6 @@ const material = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide
 });
 
-// Add wireframe overlay with glowing effect
 const wireframeMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     wireframe: true,
@@ -67,7 +66,6 @@ const wireframeTetrahedron = new THREE.Mesh(geometry.clone(), wireframeMaterial)
 tetrahedron.add(wireframeTetrahedron);
 scene.add(tetrahedron);
 
-// Set dark background
 scene.background = new THREE.Color(0x121212);
 
 camera.position.z = 4;
@@ -83,10 +81,8 @@ const axisLine = new THREE.Line(axisGeometry, axisMaterial);
 axisLine.visible = false;
 scene.add(axisLine);
 
-// Enhance axis line visibility with glowing effect
 axisMaterial.color.set(0xff3355);
 
-// Add ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
 scene.add(ambientLight);
 
@@ -204,9 +200,7 @@ button.addEventListener("click", () => {
     }
 });
 
-// Apply modern styles to UI elements
 const styleUI = () => {
-    // Style counter display with dark theme
     counterDisplay.style.fontFamily = "'Roboto', Arial, sans-serif";
     counterDisplay.style.color = "#ffffff";
     counterDisplay.style.background = "rgba(30, 30, 30, 0.8)";
@@ -216,7 +210,6 @@ const styleUI = () => {
     counterDisplay.style.fontWeight = "500";
     counterDisplay.style.border = "1px solid rgba(255, 255, 255, 0.1)";
     
-    // Style button with neon glow
     button.style.fontFamily = "'Roboto', Arial, sans-serif";
     button.style.fontSize = "16px";
     button.style.fontWeight = "500";
@@ -229,7 +222,6 @@ const styleUI = () => {
     button.style.transition = "all 0.3s ease";
     button.style.padding = "12px 20px";
     
-    // Add hover effect with glow
     button.onmouseover = () => {
         button.style.transform = "translateY(-2px)";
         button.style.boxShadow = "0 0 25px rgba(102, 51, 153, 0.9)";
@@ -240,7 +232,6 @@ const styleUI = () => {
         button.style.boxShadow = "0 0 15px rgba(102, 51, 153, 0.7)";
     };
     
-    // Add active effect
     button.onmousedown = () => {
         button.style.transform = "translateY(1px)";
         button.style.boxShadow = "0 0 10px rgba(102, 51, 153, 0.5)";
@@ -252,8 +243,6 @@ const styleUI = () => {
     };
 }
 
-// Apply the styles
 styleUI();
 
-// Optional: Make axis helper brighter for dark background
 axesHelper.material.color.set(0xffffff);
