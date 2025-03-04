@@ -134,6 +134,65 @@ counterDisplay.style.padding = "10px";
 counterDisplay.style.background = "white";
 document.body.appendChild(counterDisplay);
 
+const matrixDisplay = document.createElement("div");
+matrixDisplay.style.position = "absolute";
+matrixDisplay.style.top = "50px";
+matrixDisplay.style.right = "20px";
+matrixDisplay.style.padding = "15px";
+matrixDisplay.style.fontFamily = "'Roboto Mono', monospace";
+document.body.appendChild(matrixDisplay);
+
+function updateMatrixDisplay(rotationIndex) {
+    if (rotationIndex >= 0 && rotationIndex < rotations.length) {
+        const quaternion = rotations[rotationIndex];
+        const m = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+        const elements = m.elements;
+        
+        const formattedMatrix = [
+            [elements[0], elements[4], elements[8]],
+            [elements[1], elements[5], elements[9]],
+            [elements[2], elements[6], elements[10]]
+        ].map(row => row.map(val => val.toFixed(2)));
+        
+        let matrixHTML = `<div style="text-align:center; margin-bottom:8px; color:#00bcd4; font-weight:500;">Rotation Matrix</div>`;
+        matrixHTML += `<table style="border-collapse:collapse; margin:0 auto;">`;
+        
+        formattedMatrix.forEach(row => {
+            matrixHTML += `<tr>`;
+            row.forEach(val => {
+                matrixHTML += `<td style="padding:3px 8px; color:${Math.abs(parseFloat(val)) < 0.01 ? '#888' : '#fff'}">${val}</td>`;
+            });
+            matrixHTML += `</tr>`;
+        });
+        
+        matrixHTML += `</table>`;
+        
+        let axisInfo = "";
+        if (rotationIndex < 4) {
+            axisInfo = "120° around vertex axis";
+        } else if (rotationIndex < 8) {
+            axisInfo = "-120° around vertex axis";
+        } else {
+            axisInfo = "180° around edge axis";
+        }
+        
+        matrixHTML += `<div style="text-align:center; margin-top:8px; font-size:12px; color:#aaa;">${axisInfo}</div>`;
+        
+        matrixDisplay.innerHTML = matrixHTML;
+    }
+}
+
+function fixLayout() {
+    counterDisplay.style.top = "80px";
+    counterDisplay.style.left = "10px";
+    
+    button.style.top = "20px";
+    button.style.left = "10px";
+    
+    matrixDisplay.style.top = "50px";
+    matrixDisplay.style.right = "20px";
+}
+
 function updateAxisLine(axisIndex) {
     if (axisIndex >= 0 && axisIndex < rotationAxes.length) {
         const axis = rotationAxes[axisIndex];
@@ -146,6 +205,8 @@ function updateAxisLine(axisIndex) {
         axisGeometry.setFromPoints(points);
         
         axisGeometry.attributes.position.needsUpdate = true;
+        
+        updateMatrixDisplay(axisIndex);
     }
 }
 
@@ -209,6 +270,7 @@ const styleUI = () => {
     counterDisplay.style.fontSize = "16px";
     counterDisplay.style.fontWeight = "500";
     counterDisplay.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+    counterDisplay.style.padding = "10px 15px";
     
     button.style.fontFamily = "'Roboto', Arial, sans-serif";
     button.style.fontSize = "16px";
@@ -241,8 +303,18 @@ const styleUI = () => {
         button.style.transform = "translateY(-2px)";
         button.style.boxShadow = "0 0 25px rgba(102, 51, 153, 0.9)";
     };
+    
+    matrixDisplay.style.background = "rgba(30, 30, 30, 0.8)";
+    matrixDisplay.style.borderRadius = "8px";
+    matrixDisplay.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.5)";
+    matrixDisplay.style.fontSize = "14px";
+    matrixDisplay.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+    matrixDisplay.style.minWidth = "180px";
 }
 
 styleUI();
+fixLayout();
 
 axesHelper.material.color.set(0xffffff);
+
+updateMatrixDisplay(currentRotation);
