@@ -203,3 +203,57 @@ button.addEventListener("click", () => {
         targetQuaternion.copy(rotations[currentRotation]);
     }
 });
+
+// Apply modern styles to UI elements
+const styleUI = () => {
+    // Style counter display with dark theme
+    counterDisplay.style.fontFamily = "'Roboto', Arial, sans-serif";
+    counterDisplay.style.color = "#ffffff";
+    counterDisplay.style.background = "rgba(30, 30, 30, 0.8)";
+    counterDisplay.style.borderRadius = "8px";
+    counterDisplay.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.5)";
+    counterDisplay.style.fontSize = "16px";
+    counterDisplay.style.fontWeight = "500";
+    counterDisplay.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+    
+    // Style button with neon glow
+    button.style.fontFamily = "'Roboto', Arial, sans-serif";
+    button.style.fontSize = "16px";
+    button.style.fontWeight = "500";
+    button.style.color = "#ffffff";
+    button.style.background = "linear-gradient(135deg, #00bcd4, #673ab7)";
+    button.style.border = "none";
+    button.style.borderRadius = "8px";
+    button.style.boxShadow = "0 0 15px rgba(102, 51, 153, 0.7)";
+    button.style.cursor = "pointer";
+    button.style.transition = "all 0.3s ease";
+    button.style.padding = "12px 20px";
+    
+    // Add hover effect with glow
+    button.onmouseover = () => {
+        button.style.transform = "translateY(-2px)";
+        button.style.boxShadow = "0 0 25px rgba(102, 51, 153, 0.9)";
+    };
+    
+    button.onmouseout = () => {
+        button.style.transform = "translateY(0)";
+        button.style.boxShadow = "0 0 15px rgba(102, 51, 153, 0.7)";
+    };
+    
+    // Add active effect
+    button.onmousedown = () => {
+        button.style.transform = "translateY(1px)";
+        button.style.boxShadow = "0 0 10px rgba(102, 51, 153, 0.5)";
+    };
+    
+    button.onmouseup = () => {
+        button.style.transform = "translateY(-2px)";
+        button.style.boxShadow = "0 0 25px rgba(102, 51, 153, 0.9)";
+    };
+}
+
+// Apply the styles
+styleUI();
+
+// Optional: Make axis helper brighter for dark background
+axesHelper.material.color.set(0xffffff);
